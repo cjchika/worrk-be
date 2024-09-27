@@ -1,9 +1,12 @@
 const User = require("../models/User");
 const { StatusCodes } = require("http-status-codes");
-const { BadRequestError } = require("../errors");
+const { BadRequestError, UnauthenticatedError } = require("../errors");
 
 const register = async (req, res) => {
   const { firstName, lastName, email, password } = req.body;
+
+  // console.log(firstName);
+
   if (!firstName || !lastName || !email || !password) {
     throw new BadRequestError("All fields are required");
   }
@@ -15,13 +18,16 @@ const register = async (req, res) => {
 
   const newUser = new User({ firstName, lastName, email, password });
 
-  const user = await newUser.save();
+  await newUser.save();
+  // console.log(newUser);
 
-  const token = user.getJwtToken();
+  // const token = user.getJwtToken();
 
-  res
-    .status(StatusCodes.CREATED)
-    .json({ user: { firstName, lastName, email }, token });
+  res.status(StatusCodes.CREATED).json({
+    success: true,
+    msg: "Registered successfully!",
+    user: { firstName, lastName, email },
+  });
 };
 
 const login = async (req, res) => {
@@ -31,28 +37,32 @@ const login = async (req, res) => {
     throw new BadRequestError("Please provide email and password");
   }
 
-  // console.log(email);
-
+  // Find user by email
   const user = await User.findOne({ email });
 
   if (!user) {
     throw new UnauthenticatedError("Invalid Credentials!");
   }
 
-  // compare password
+  // Compare password
   const isPasswordCorrect = await user.comparePassword(password);
 
   if (!isPasswordCorrect) {
     throw new UnauthenticatedError("Invalid Credentials");
   }
 
-  // create token
+  // Create token
   const token = user.getJwtToken();
 
-  // exclude password
-  const theUser = user.toJSON();
+  // Return only necessary user info
+  const { firstName, lastName, email: userEmail } = user;
 
-  res.status(StatusCodes.OK).json({ success: true, user: theUser, token });
+  res.status(StatusCodes.OK).json({
+    msg: "Login successful!",
+    success: true,
+    user: { firstName, lastName, email: userEmail },
+    token,
+  });
 };
 
 module.exports = { register, login };

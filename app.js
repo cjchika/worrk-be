@@ -1,6 +1,7 @@
 require("dotenv").config();
 require("express-async-errors");
 const express = require("express");
+const cors = require("cors");
 const app = express();
 
 // CONNECT TO DB
@@ -15,6 +16,7 @@ const notFoundMiddleware = require("./middleware/not-found");
 const errorHandlerMiddleware = require("./middleware/error-handler");
 
 app.use(express.json());
+app.use(cors());
 // extra packages
 
 // routes

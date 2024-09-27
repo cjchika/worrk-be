@@ -8,7 +8,7 @@ const mongoose = require("mongoose");
 const getAllJobs = async (req, res) => {
   try {
     const jobs = await Job.find();
-    res.status(200).json(jobs);
+    res.status(200).json({ success: true, jobs });
   } catch (error) {
     res
       .status(500)
@@ -24,7 +24,7 @@ const getJob = async (req, res) => {
     if (!job) {
       return res.status(404).json({ message: "Job not found" });
     }
-    res.status(200).json(job);
+    res.status(200).json({ success: true, msg: "Job", job });
   } catch (error) {
     res
       .status(500)
