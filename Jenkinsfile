@@ -32,7 +32,10 @@ pipeline {
 			steps{
 				script {
 						withCredentials([usernamePassword(credentialsId: 'docker-auth', usernameVariable: 'DOCKER_HUB_CREDENTIALS_USR', passwordVariable: 'DOCKER_HUB_CREDENTIALS_PSW')]) {
-							sh "docker login -u $DOCKER_HUB_CREDENTIALS_USR -p $DOCKER_HUB_CREDENTIALS_PSW"
+							// sh "docker login -u $DOCKER_HUB_CREDENTIALS_USR -p $DOCKER_HUB_CREDENTIALS_PSW"
+							sh """
+								echo $DOCKER_HUB_CREDENTIALS_PSW | docker login -u $DOCKER_HUB_CREDENTIALS_USR --password-stdin
+							"""
 					}
 				}
 			}
@@ -42,7 +45,7 @@ pipeline {
 					script {
 						sh "docker tag $IMAGE_NAME:$BUILD_NUMBER $IMAGE_NAME:latest"
 						sh "docker push $IMAGE_NAME:$BUILD_NUMBER"
-						sh "docker push $IMAGE_NAME:latest"
+						// sh "docker push $IMAGE_NAME:latest"
 					}
 			}
 		}
