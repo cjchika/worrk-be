@@ -6,7 +6,7 @@ def COLOR_MAP = [
 pipeline {
   agent any 
 	environment {
-		DOCKER_HUB_CREDENTIALS = credentials('docker-auth')
+		DOCKER_HUB_CREDENTIALS = credentials('docker-pat')
 		IMAGE_NAME = 'cjchika/backend-node'
 		PORT = "${env.PORT}"
 		MONGO_URI = "${env.MONGO_URI}"
@@ -48,13 +48,6 @@ pipeline {
 			slackSend channel: 'jenkinspipeline',
 				color: COLOR_MAP[currentBuild.currentResult],
 				message: "*${currentBuild.currentResult}:* Job ${env.JOB_NAME} build ${env.BUILD_URL}"
-
-			// success {
-			// slackSend channel: 'jenkinspipeline', message: "Backend build successful: ${env.BUILD_URL}"
-			// }
-			// failure {
-			// 		slackSend channel: 'jenkinspipeline', message: "Backend build failed: ${env.BUILD_URL}"
-			// }
 		}
 		
 	}
