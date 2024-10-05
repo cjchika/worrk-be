@@ -41,7 +41,7 @@ pipeline {
 			steps{
 					script {
 						sh "docker tag $IMAGE_NAME:$BUILD_NUMBER $IMAGE_NAME:latest"
-						sh "docker push $IMAGE_NAME:$BUILD_NAME"
+						sh "docker push $IMAGE_NAME:$BUILD_NUMBER"
 						sh "docker push $IMAGE_NAME:latest"
 					}
 			}
