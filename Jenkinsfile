@@ -6,7 +6,7 @@ def COLOR_MAP = [
 pipeline {
   agent any 
 	environment {
-		DOCKER_HUB_CREDENTIALS = credentials('docker-pat')
+		DOCKER_HUB_CREDENTIALS = credentials('docker-auth')
 		IMAGE_NAME = 'cjchika/backend-node'
 		PORT = "${env.PORT}"
 		MONGO_URI = "${env.MONGO_URI}"
@@ -17,7 +17,7 @@ pipeline {
 		stage('Clone Backend Repository'){
 			steps{
 				git branch: 'jenkins-ci', 
-				credentialsId: 'github-auth', 
+				credentialsId: 'github-pat', 
 				url: 'https://github.com/cjchika/worrk-be.git'
 			}
 		}
