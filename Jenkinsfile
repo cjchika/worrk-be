@@ -42,7 +42,7 @@ pipeline {
 			slackSend channel: 'jenkinspipeline', message: "Backend build successful: ${env.BUILD_URL}"
 		}
 		failure {
-				slackSend channel: '#your-slack-channel', message: "Backend build failed: ${env.BUILD_URL}"
+				slackSend channel: 'jenkinspipeline', message: "Backend build failed: ${env.BUILD_URL}"
 		}
 	}
 }
