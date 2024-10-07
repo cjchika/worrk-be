@@ -13,7 +13,7 @@ pipeline {
 		JWT_SECRET = "${env.JWT_SECRET}"
 		SONAR_TOKEN = 'sonartoken'
 		SONAR_SCANNER = 'sonarscanner'
-		SONAR_HOST_URL = 'http://54.234.252.213'
+		SONAR_HOST_URL = 'http://52.90.194.8'
 		SONAR_PROJECT_KEY = 'backend-node'
 	}
 
