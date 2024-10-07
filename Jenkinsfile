@@ -33,14 +33,15 @@ pipeline {
 		stage('SonarQube Analysis'){
 			steps{
 				script{
-					withSonarQubeEnv('sonarserver')
-					sh '''
+					withSonarQubeEnv('sonarserver'){
+						sh '''
 						sonar-scanner \
 						-Dsonar.projectKey=$SONAR_PROJECT_KEY \
 						-Dsonar.sources=. \
 						-Dsonar.host.url=$SONAR_HOST_URL \
 						-Dsonar.login=$SONAR_TOKEN
 					'''
+					}
 				}
 			}
 		}
