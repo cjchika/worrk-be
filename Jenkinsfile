@@ -31,9 +31,9 @@ pipeline {
 			}
 		}
 		stage('SonarQube Analysis'){
-			tools{
-					sonarScanner 'sonarscanner'
-			}
+			// tools{
+			// 		sonarScanner 'sonarscanner'
+			// }
 			steps{
 				script{
 					sh '''
