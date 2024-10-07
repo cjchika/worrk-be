@@ -11,7 +11,7 @@ pipeline {
 		PORT = "${env.PORT}"
 		MONGO_URI = "${env.MONGO_URI}"
 		JWT_SECRET = "${env.JWT_SECRET}"
-		SONAR_TOKEN = 'sonartoken'
+		SONAR_TOKEN = "${env.SONAR_AUTH}"
 		SONAR_SCANNER = 'sonarscanner'
 		SONAR_HOST_URL = 'http://52.90.194.8'
 		SONAR_PROJECT_KEY = 'backend-node'
@@ -25,7 +25,15 @@ pipeline {
 				url: 'https://github.com/cjchika/worrk-be.git'
 			}
 		}
+		stage('Test SonarQube Scanner') {
+			steps {
+				sh 'which sonar-scanner'
+			}
+		}
 		stage('SonarQube Analysis'){
+			tools{
+					sonarScanner 'sonarscanner'
+			}
 			steps{
 				script{
 					sh '''
