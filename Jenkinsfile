@@ -21,14 +21,11 @@ pipeline {
 		stage('Clone Backend Repository'){
 			steps{
 				git branch: 'jenkins-ci', 
-				credentialsId: 'github-pat', 
+				credentialsId: 'github-token', 
 				url: 'https://github.com/cjchika/worrk-be.git'
 			}
 		}
 		stage('SonarQube Analysis'){
-			environment {
-					scannerHome = tool 'sonarscanner4'
-				}
 			steps{
 				script{
 					sh '''
