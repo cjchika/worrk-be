@@ -31,9 +31,6 @@ pipeline {
 			}
 		}
 		stage('SonarQube Analysis'){
-			// tools{
-			// 		sonarScanner 'sonarscanner'
-			// }
 			steps{
 				script{
 					sh '''
@@ -46,18 +43,18 @@ pipeline {
 				}
 			}
 		}
-		// stage('Check Quality Gate'){
-		// 	steps{
-		// 		script{
-		// 			timeout(time: 5, unit: 'MINUTES') {
-		// 				def qualityGate = waitForQualityGate() 
-		// 				if(qualityGate.status != 'OK'){
-		// 					error "SonarQube Quality Gate failed: ${qualityGate.status}"
-		// 				}
-		// 			}
-		// 		}
-		// 	}
-		// }
+		stage('Check Quality Gate'){
+			steps{
+				script{
+					timeout(time: 5, unit: 'MINUTES') {
+						def qualityGate = waitForQualityGate() 
+						if(qualityGate.status != 'OK'){
+							error "SonarQube Quality Gate failed: ${qualityGate.status}"
+						}
+					}
+				}
+			}
+		}
 		stage('Build Backend Docker Image') {
 			steps {
 				script{
