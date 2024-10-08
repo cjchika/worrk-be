@@ -1,0 +1,45 @@
+version: 0.2
+
+env:
+  variables:
+    AWS_DEFAULT_REGION: 'us-east-1'
+  paramater-store:
+    SONAR_TOKEN: SONAR_TOKEN
+    HOST: HOST
+    Organization: Organization
+    Project: Project
+    Account_ID: Account_ID
+
+phases:
+  install:
+    commands:
+      - echo Installing dependencies...
+      - npm install
+
+  pre_build:
+    commands:
+      - echo Running SonarCloud code quality checks...
+      - npm install -g sonarqube-scanner
+      - sonar-scanner \
+          -Dsonar.projectKey=$Project \
+          -Dsonar.organization=$Organization \
+          -Dsonar.sources=. \
+          -Dsonar.host.url=$HOST \
+          -Dsonar.login=$SONAR_TOKEN
+
+  build:
+    commands:
+      - echo Building Docker image...
+      - $(aws ecr get-login --no-include-email --region $AWS_DEFAULT_REGION)
+      - docker build -t <your_image_name> .
+      - docker tag <your_image_name>:latest $Account_ID.dkr.ecr.$AWS_DEFAULT_REGION.amazonaws.com/<your_image_name>:latest
+
+  post_build:
+    commands:
+      - echo Pushing Docker image to ECR...
+      - docker push $Account_ID.dkr.ecr.$AWS_DEFAULT_REGION.amazonaws.com/<your_image_name>:latest
+
+artifacts:
+  files:
+    - '**/*'
+  discard-paths: yes

@@ -1,0 +1,32 @@
+version: 0.2
+
+env:
+  variables:
+    AWS_DEFAULT_REGION: 'us-east-1'
+    IMAGE_NAME: 'backend-node'
+  parameter-store:
+    Account_ID: Account_ID
+
+phases:
+  install:
+    commands:
+      - echo "Installing dependencies for Docker build..."
+      - apt-get update -y
+      - apt-get install -y docker
+      - $(aws ecr get-login --no-include-email --region $AWS_DEFAULT_REGION)
+
+  build:
+    commands:
+      - echo "Building Docker image..."
+      - docker build -t $IMAGE_NAME .
+      - docker tag $IMAGE_NAME:latest $Account_ID.dkr.ecr.$AWS_DEFAULT_REGION.amazonaws.com/$IMAGE_NAME:latest
+
+  post_build:
+    commands:
+      - echo "Pushing Docker image to ECR..."
+      - docker push $Account_ID.dkr.ecr.$AWS_DEFAULT_REGION.amazonaws.com/$IMAGE_NAME:latest
+
+artifacts:
+  files:
+    - '**/*'
+  discard-paths: yes
