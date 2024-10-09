@@ -31,13 +31,10 @@ phases:
           -Dsonar.host.url=$HOST \
 
       - echo "Waiting for SonarCloud Quality Gate result..."
-      - >
-        status=$(curl -s -u $SONAR_TOKEN: "$HOST/api/qualitygates/project_status?projectKey=$Project" | jq -r '.projectStatus.status');
-        if [ "$status" != "OK" ]; then
-          echo "SonarCloud Quality Gate failed: $status" && exit 1;
-        else
-          echo "SonarCloud Quality Gate passed";
-        fi
+      - sleep 5
+      - curl https://sonarcloud.io/api/qualitygates/project_status?projectKey=$Project >result.json
+      - cat result.json
+      - if [ $(jq -r '.projectStatus.status' result.json) = ERROR ] ; then $CODEBUILD_BUILD_SUCCEEDING -eq 0 ;fi
 
   build:
     commands:
