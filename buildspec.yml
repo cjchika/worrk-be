@@ -22,8 +22,12 @@ phases:
 
   pre_build:
     commands:
+      - echo "Sonar Organization (partial): ${Organization:0:5}..."
+      - echo "Sonar Project (partial): ${Project:0:5}..."
       - echo "Running SonarCloud code quality checks..."
       - npm install -g sonarqube-scanner
+      - echo "Running sonar-scanner with:"
+      - echo "sonar-scanner -Dsonar.projectKey=$Project -Dsonar.organization=$Organization -Dsonar.sources=. -Dsonar.host.url=$HOST -Dsonar.login=$SONAR_TOKEN"
       - sonar-scanner \
           -Dsonar.projectKey=$Project \
           -Dsonar.organization=$Organization \
