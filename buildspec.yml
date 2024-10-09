@@ -16,8 +16,8 @@ phases:
       - apt-get update -y
       - apt-get install -y curl jq
       - npm install
-      - echo "Sonar Organization: $Organization"
-      - echo "Sonar Project: $Project"
+      - echo $Organization
+      - echo $Project
 
 
   pre_build:
