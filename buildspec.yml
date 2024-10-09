@@ -16,6 +16,9 @@ phases:
       - apt-get update -y
       - apt-get install -y curl jq
       - npm install
+      - echo "Sonar Organization: $Organization"
+      - echo "Sonar Project: $Project"
+
 
   pre_build:
     commands:
@@ -27,7 +30,7 @@ phases:
           -Dsonar.sources=. \
           -Dsonar.host.url=$HOST \
           -Dsonar.login=$SONAR_TOKEN
-      
+
       - echo "Waiting for SonarCloud Quality Gate result..."
       - >
         status=$(curl -s -u $SONAR_TOKEN: "$HOST/api/qualitygates/project_status?projectKey=$Project" | jq -r '.projectStatus.status');
@@ -36,9 +39,11 @@ phases:
         else
           echo "SonarCloud Quality Gate passed";
         fi
+
   build:
     commands:
       - echo "SonarCloud analysis completed successfully."
+
 artifacts:
   files:
     - '**/*'
