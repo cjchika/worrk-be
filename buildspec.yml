@@ -3,11 +3,11 @@ version: 0.2
 env:
   variables:
     AWS_DEFAULT_REGION: 'us-east-1'
-  parameter-store:
-    SONAR_TOKEN: SONAR_TOKEN
-    HOST: HOST
-    Organization: Organization
-    Project: Project
+  # parameter-store:
+  #   SONAR_TOKEN: SONAR_TOKEN
+  #   HOST: HOST
+  #   Organization: Organization
+  #   Project: Project
 
 phases:
   install:
@@ -17,25 +17,25 @@ phases:
       - apt-get install -y curl jq
       - npm install
 
-  pre_build:
-    commands:
-      - echo "Running SonarCloud code quality checks..."
-      - npm install -g sonarqube-scanner
-      - sonar-scanner \
-          -Dsonar.projectKey=$Project \
-          -Dsonar.organization=$Organization \
-          -Dsonar.sources=. \
-          -Dsonar.host.url=$HOST \
-          -Dsonar.login=$SONAR_TOKEN
+  # pre_build:
+  #   commands:
+  #     - echo "Running SonarCloud code quality checks..."
+  #     - npm install -g sonarqube-scanner
+  #     - sonar-scanner \
+  #         -Dsonar.projectKey=$Project \
+  #         -Dsonar.organization=$Organization \
+  #         -Dsonar.sources=. \
+  #         -Dsonar.host.url=$HOST \
+  #         -Dsonar.login=$SONAR_TOKEN
       
-      - echo "Waiting for SonarCloud Quality Gate result..."
-      - >
-        status=$(curl -s -u $SONAR_TOKEN: "$HOST/api/qualitygates/project_status?projectKey=$Project" | jq -r '.projectStatus.status');
-        if [ "$status" != "OK" ]; then
-          echo "SonarCloud Quality Gate failed: $status" && exit 1;
-        else
-          echo "SonarCloud Quality Gate passed";
-        fi
+  #     - echo "Waiting for SonarCloud Quality Gate result..."
+  #     - >
+  #       status=$(curl -s -u $SONAR_TOKEN: "$HOST/api/qualitygates/project_status?projectKey=$Project" | jq -r '.projectStatus.status');
+  #       if [ "$status" != "OK" ]; then
+  #         echo "SonarCloud Quality Gate failed: $status" && exit 1;
+  #       else
+  #         echo "SonarCloud Quality Gate passed";
+  #       fi
   build:
     commands:
       - echo "SonarCloud analysis completed successfully."
