@@ -16,13 +16,21 @@ phases:
       - apt-get update -y
       - apt-get install -y curl jq
       - npm install
-      - echo $Organization
-      - echo $Project
 
   pre_build:
     commands:
+      - echo "Installing SonarScanner CLI..."
+      - export SONAR_SCANNER_VERSION=6.2.1.4610
+      - export SONAR_SCANNER_HOME=$HOME/.sonar/sonar-scanner-$SONAR_SCANNER_VERSION-linux-x64
+      - curl --create-dirs -sSLo $HOME/.sonar/sonar-scanner.zip https://binaries.sonarsource.com/Distribution/sonar-scanner-cli/sonar-scanner-cli-$SONAR_SCANNER_VERSION-linux-x64.zip
+      - unzip -o $HOME/.sonar/sonar-scanner.zip -d $HOME/.sonar/
+      - export PATH=$SONAR_SCANNER_HOME/bin:$PATH
+      - export SONAR_SCANNER_OPTS="-server"
+
+  build:
+    commands:
       - echo "Running SonarCloud code quality checks..."
-      - npm install -g sonarqube-scanner
+      # - npm install -g sonarqube-scanner
       - sonar-scanner \
           -Dsonar.organization=$Organization \
           -Dsonar.projectKey=$Project \
@@ -32,13 +40,9 @@ phases:
 
       - echo "Waiting for SonarCloud Quality Gate result..."
       - sleep 5
-      - curl https://sonarcloud.io/api/qualitygates/project_status?projectKey=$Project >result.json
+      - curl $HOST/api/qualitygates/project_status?projectKey=$Project >result.json
       - cat result.json
       - if [ $(jq -r '.projectStatus.status' result.json) = ERROR ] ; then $CODEBUILD_BUILD_SUCCEEDING -eq 0 ;fi
-
-  build:
-    commands:
-      - echo "SonarCloud analysis completed successfully."
 
 artifacts:
   files:
