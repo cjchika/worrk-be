@@ -15,6 +15,8 @@ pipeline {
         registryCredential = "${env.REGISTRY_CRED}"
         appRegistry = "${REGISTRY}/backendnodeimg"
         jobappRegistry = "https://${REGISTRY}"
+				cluster = 'mern_cluster_stage'
+				service = 'backend-node-svc'
     }
 
     stages {
@@ -71,7 +73,7 @@ pipeline {
             }
         }
 
-        stage('Push Frontend Docker Image to ECR') {
+        stage('Push Backend Docker Image to ECR') {
             steps {
                 script {
                     docker.withRegistry(jobappRegistry, registryCredential) {
@@ -81,6 +83,14 @@ pipeline {
                 }
             }
         }
+
+				stage('Deploy to ECS staging'){
+					steps {
+						withAWS(credentials: ${env.CREDVAR}, region: ${env.REGION}){
+							sh 'aws ecs update-service --cluster ${cluster} --service ${service} --force-new-deployment'
+						}
+					}
+				}
     }
 
     post {
