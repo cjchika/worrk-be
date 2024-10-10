@@ -59,7 +59,7 @@ pipeline {
                             error "SonarQube Quality Gate failed: ${qualityGate.status}"
                         }
 												echo(qualityGate.status)
-												// echo(message: 'Checking QG, Taking time...')
+												echo(message: 'Checking QG...')
                     }
                 }
             }
