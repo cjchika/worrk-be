@@ -50,4 +50,4 @@ jobs:
           SONAR_HOST_URL: ${{ secrets.SONAR_URL }}
 
       - name: "SonarQube Quality Gate Status"
-        run: echo "The Quality Gate status is ${{ steps.sonarqube-quality-gate-check.outputs.quality-gate-status }}"
+        run: echo "Quality Gate status is ${{ steps.sonarqube-quality-gate-check.outputs.quality-gate-status }}"
