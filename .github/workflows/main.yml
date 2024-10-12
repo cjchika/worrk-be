@@ -27,8 +27,8 @@ jobs:
 
       - name: SonarQube Scan
         env:
-          SONAR_HOST_URL: ${{ secrets.SONAR_URL }}
-          SONAR_LOGIN: ${{ secrets.SONAR_TOKEN }}
+          SONAR_URL: ${{ secrets.SONAR_URL }}
+          SONAR_TOKEN: ${{ secrets.SONAR_TOKEN }}
           SONAR_ORGANIZATION: ${{ secrets.SONAR_ORGANIZATION }}
           SONAR_PROJECT_KEY: ${{ secrets.SONAR_PROJECT_KEY }}
           GITHUB_WORKSPACE: $GITHUB_WORKSPACE
