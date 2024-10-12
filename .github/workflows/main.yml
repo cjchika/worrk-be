@@ -34,8 +34,20 @@ jobs:
           GITHUB_WORKSPACE: $GITHUB_WORKSPACE
         run: |
           sonar-scanner \
-            -Dsonar.host.url=$SONAR_HOST_URL \
+            -Dsonar.host.url=$SONAR_URL \
             -Dsonar.login=$SONAR_LOGIN \
             -Dsonar.organization=$SONAR_ORGANIZATION \
             -Dsonar.projectKey=$SONAR_PROJECT_KEY \
             -Dsonar.sources=$GITHUB_WORKSPACE
+
+      - name: SonarQube Quality Gate check
+        id: sonarqube-quality-gate-check
+        uses: sonarsource/sonarqube-quality-gate-action@master
+
+        timeout-minutes: 5
+        env:
+          SONAR_TOKEN: ${{ secrets.SONAR_TOKEN }}
+          SONAR_HOST_URL: ${{ secrets.SONAR_URL }}
+
+      - name: "Example show SonarQube Quality Gate Status value"
+        run: echo "The Quality Gate status is ${{ steps.sonarqube-quality-gate-check.outputs.quality-gate-status }}"
