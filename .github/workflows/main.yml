@@ -1,8 +1,8 @@
 name: jobApp Backend Actions
 on:
-  push:
-    branches:
-      - github-actions
+  # push:
+  #   branches:
+  #     - github-actions
   workflow_dispatch:
 env:
   SONAR_URL: ${{ secrets.SONAR_URL }}
