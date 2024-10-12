@@ -8,5 +8,28 @@ jobs:
   Testing:
     runs-on: ubuntu-latest
     steps:
-      - name: Testing workflow
-        run: echo "Workflow works!"
+      - name: Code checkout
+        uses: actions/checkout@v4
+
+      - name: Set up Node.js
+        uses: actions/setup-node@v2
+        with:
+          node-version: "14"
+
+      - name: Install dependencies
+        run: npm install
+
+      - name: Run Tests
+        run: npm test || echo "No tests to run"
+
+      - name: Setup SonarQube
+        uses: warchant/setup-sonar-scanner@v7
+
+      - name: SonarQube Scan
+        run: sonar-scanner
+        env: # Set environment variables here
+          SONAR_HOST_URL: ${{ secrets.SONAR_URL }}
+          SONAR_LOGIN: ${{ secrets.SONAR_TOKEN }}
+          SONAR_ORGANIZATION: ${{ secrets.SONAR_ORGANIZATION }}
+          SONAR_PROJECT_KEY: ${{ secrets.SONAR_PROJECT_KEY }}
+          GITHUB_WORKSPACE: $GITHUB_WORKSPACE
