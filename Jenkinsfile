@@ -6,15 +6,11 @@ def COLOR_MAP = [
 pipeline {
   agent any 
 	environment {
-		// DOCKER_HUB_CREDENTIALS = credentials('docker-auth')
-		IMAGE_NAME = 'cjchika/backend-node'
-		PORT = "${env.PORT}"
-		MONGO_URI = "${env.MONGO_URI}"
-		JWT_SECRET = "${env.JWT_SECRET}"
-		SONAR_TOKEN = "${env.SONAR_AUTH}"
-		SONAR_SCANNER = 'sonarscanner'
-		SONAR_HOST_URL = 'http://52.90.194.8'
-		SONAR_PROJECT_KEY = 'backend-node'
+		ARTIFACT_NAME: "backend-job-app${BUILD_ID}.zip"
+		AWS_S3_BUCKET = 'backend-job'
+		AWS_EB_APP_NAME = 'backend-job'
+		AWS_EB_ENVIRONMENT = 'Backend-job-env'
+		AWS_EB_APP_VERSION = "${BUILD_ID}"
 	}
 
 	stages {
@@ -25,42 +21,39 @@ pipeline {
 				url: 'https://github.com/cjchika/worrk-be.git'
 			}
 		}
-		
-		stage('Build Backend Docker Image') {
+
+		stage('Build Backend App for Beanstalk') {
 			steps {
 				script{
-					sh "docker build -t $IMAGE_NAME:$BUILD_NUMBER ."
+					sh "npm intall --production"
+					sh "zip -r $ARTIFACT_NAME ./"
 				}
 			}
 		}
-		stage('Login to Docker Hub'){
-			steps{
-				script {
-						withCredentials([usernamePassword(credentialsId: 'docker-auth', usernameVariable: 'DOCKER_HUB_CREDENTIALS_USR', passwordVariable: 'DOCKER_HUB_CREDENTIALS_PSW')]) {
-							// sh "docker login -u $DOCKER_HUB_CREDENTIALS_USR -p $DOCKER_HUB_CREDENTIALS_PSW"
-							sh """
-								echo $DOCKER_HUB_CREDENTIALS_PSW | docker login -u $DOCKER_HUB_CREDENTIALS_USR --password-stdin
-							"""
-					}
+
+		stage('Upload to S3') {
+			steps {
+				withAWS(credentials: "${env.CREDVAR}", region: "${env.REGION}"){
+					sh "aws s3 cp app-artifact.zip s3://$AWS_S3_BUCKET/$ARTIFACT_NAME"
 				}
+			}  
+        }
+
+		stage('Deploy to Beanstalk') {
+			steps {
+				withAWS(credentials: "${env.CREDVAR}", region: "${env.REGION}"){
+					// sh 'aws s3 cp ./app-artifact.zip s3://$AWS_S3_BUCKET/$ARTIFACT_NAME'
+					sh 'aws elasticbeanstalk create-application-version --application-name $AWS_EB_APP_NAME --version-label $AWS_EB_APP_VERSION --source-bundle S3Bucket=$AWS_S3_BUCKET,S3Key=$ARTIFACT_NAME'
+               		sh 'aws elasticbeanstalk update-environment --application-name $AWS_EB_APP_NAME --environment-name $AWS_EB_ENVIRONMENT --version-label $AWS_EB_APP_VERSION'
+            	}
 			}
-		}
-		stage('Push Backend Docker Image to Docker Hub') {
-			steps{
-					script {
-						sh "docker tag $IMAGE_NAME:$BUILD_NUMBER $IMAGE_NAME:latest"
-						sh "docker push $IMAGE_NAME:$BUILD_NUMBER"
-						// sh "docker push $IMAGE_NAME:latest"
-					}
-			}
-		}
+		}  
+		
 	}
 	post{
 		always {
 			cleanWs()
-
 			echo 'Slack Notifications'
-
 			slackSend channel: 'jenkinspipeline',
 				color: COLOR_MAP[currentBuild.currentResult],
 				message: "*${currentBuild.currentResult}:* Job ${env.JOB_NAME} build ${env.BUILD_URL}"
