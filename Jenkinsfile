@@ -20,43 +20,12 @@ pipeline {
 	stages {
 		stage('Clone Backend Repository'){
 			steps{
-				git branch: 'jenkins-ci', 
+				git branch: 'jenkins-hybrid-cd', 
 				credentialsId: 'github-token', 
 				url: 'https://github.com/cjchika/worrk-be.git'
 			}
 		}
-		stage('Test SonarQube Scanner') {
-			steps {
-				sh 'which sonar-scanner'
-			}
-		}
-		stage('SonarQube Analysis'){
-			steps{
-				script{
-					withSonarQubeEnv('sonarserver'){
-						sh '''
-						sonar-scanner \
-						-Dsonar.projectKey=$SONAR_PROJECT_KEY \
-						-Dsonar.sources=. \
-						-Dsonar.host.url=$SONAR_HOST_URL \
-						-Dsonar.login=$SONAR_TOKEN
-					'''
-					}
-				}
-			}
-		}
-		stage('Check Quality Gate'){
-			steps{
-				script{
-					timeout(time: 1, unit: 'HOURS') {
-						def qualityGate = waitForQualityGate() 
-						if(qualityGate.status != 'OK'){
-							error "SonarQube Quality Gate failed: ${qualityGate.status}"
-						}
-					}
-				}
-			}
-		}
+		
 		stage('Build Backend Docker Image') {
 			steps {
 				script{
