@@ -22,10 +22,17 @@ pipeline {
 			}
 		}
 
+		 stage('Install Dependencies') {
+            steps {
+                script {
+                    sh 'npm install --production'
+                }
+            }
+        }
+
 		stage('Build Backend App for Beanstalk') {
 			steps {
 				script{
-					sh "npm intall --production"
 					sh "zip -r $ARTIFACT_NAME ./"
 				}
 			}
