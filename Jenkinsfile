@@ -6,7 +6,7 @@ def COLOR_MAP = [
 pipeline {
   agent any 
 	environment {
-		ARTIFACT_NAME: = "backend-job-app${BUILD_ID}.zip"
+		ARTIFACT_NAME = "backend-job-app${BUILD_ID}.zip"
 		AWS_S3_BUCKET = 'backend-job'
 		AWS_EB_APP_NAME = 'backend-job'
 		AWS_EB_ENVIRONMENT = 'Backend-job-env'
